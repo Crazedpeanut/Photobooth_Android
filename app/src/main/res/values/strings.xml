@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">CameraApp</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="imagePreviewText">Take some photos!</string>
+    <string name="imageListText">List Images</string>
+    <string name="pref_default_server_hostname">charizard</string>
+    <string name="pref_default_server_port">8000</string>
+    <string name="title_activity_image_preview">ImagePreview</string>
+    <string name="pref_default_image_capture_rate">3700</string>
+    <string name="image_prev_instructions">Press the screen to take pictures</string>
+</resources>

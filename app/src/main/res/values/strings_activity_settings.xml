@@ -1,0 +1,14 @@
+<resources>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Strings related to Settings -->
+
+    <!-- Example General settings -->
+    <string name="pref_header_general">General</string>
+
+
+    <string name="pref_title_server_hostname">Server Hostname</string>
+    <string name="pref_title_server_port">Server Port</string>
+
+    <string name="pref_title_image_capture_rate">Image Capture Rate</string>
+</resources>
