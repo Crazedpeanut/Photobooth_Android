@@ -50,6 +50,7 @@ public class FileSendThread implements Runnable
 
     public void run()
     {
+        FilesSerializable filesSerializable;
         socket = new Socket();
         String threadName;
         OutputStream outputStream;
@@ -57,7 +58,9 @@ public class FileSendThread implements Runnable
         BufferedOutputStream bufferedOutputStream;
         byte[] buffer;
 
-        buffer = FileSender.imagesToBuffer(files);
+        filesSerializable = new FilesSerializable(files);
+
+        buffer = filesSerializable.toByteArray();
         threadName = Thread.currentThread().getName();
 
         try
