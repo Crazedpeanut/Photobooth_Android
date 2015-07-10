@@ -36,15 +36,15 @@ public class ImagePreview extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.image_preview);
 
-        fileSender = new FileSender();
+        fileSender = new FileSender(this);
 
         intent = getIntent();
         images = new File[4];
 
-        images[0] = new File(intent.getStringExtra("image0"));
-        images[1] = new File(intent.getStringExtra("image1"));
-        images[2] = new File(intent.getStringExtra("image2"));
-        images[3] = new File(intent.getStringExtra("image3"));
+        images[0] = new File(getFilesDir().getPath() + "/" + intent.getStringExtra("image0"));
+        images[1] = new File(getFilesDir().getPath() + "/" + intent.getStringExtra("image1"));
+        images[2] = new File(getFilesDir().getPath() + "/" + intent.getStringExtra("image2"));
+        images[3] = new File(getFilesDir().getPath() + "/" + intent.getStringExtra("image3"));
 
         previewWebView = (WebView)findViewById(R.id.previewWebView);
         previewWebView.setWebViewClient(new WebViewClient(){
@@ -57,8 +57,13 @@ public class ImagePreview extends ActionBarActivity {
             public void onPageFinished(WebView view, String url) {
                 Log.i(TAG, "page finished loading " + url);
                 //createWebPrintJob(view);
-                fileSender.
 
+                for(File f : images)
+                {
+                    Log.d(TAG, String.format("File Name: %s",f.getName()));
+                }
+
+                fileSender.sendFiles(images);
             }
         });
 

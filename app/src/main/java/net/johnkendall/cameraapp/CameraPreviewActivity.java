@@ -51,6 +51,8 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
     Timer timer;
     TimerTask timerTask;
 
+    boolean isCapturing = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,9 +60,6 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
 
         imageIndex = 0;
         countDown = 0;
-
-        timer = new Timer();
-        initTimerTask();
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         timeBetweenSnaps = Integer.valueOf(sharedPreferences.getString(getResources().getString(R.string.pref_default_image_capture_rate), "3000"));
@@ -82,15 +81,25 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
 
                 Log.d(TAG, "Pressed");
 
-                try
+                if(isCapturing)
                 {
-                    captureImages(v);
-                    //Toast.makeText(getApplicationContext(), "Taking pictures..", Toast.LENGTH_LONG).show();
+                    timer.cancel();
+                    reset();
                 }
-                catch(IOException e)
+                else
                 {
-                    e.printStackTrace();
+                    try
+                    {
+                        isCapturing = true;
+                        captureImages(v);
+                        //Toast.makeText(getApplicationContext(), "Taking pictures..", Toast.LENGTH_LONG).show();
+                    }
+                    catch(IOException e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
+
             }
         });
 
@@ -137,13 +146,13 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
 
                 if(imageIndex == 3)
                 {
-                    imageNumIndicator.setImageResource(android.R.color.transparent);
+                    reset();
 
                     Intent intent = new Intent(getApplicationContext(), ImagePreview.class);
                     intent.putExtra("image0","0.jpg");
-                    intent.putExtra("image0","1.jpg");
-                    intent.putExtra("image0","2.jpg");
-                    intent.putExtra("image0","3.jpg");
+                    intent.putExtra("image1","1.jpg");
+                    intent.putExtra("image2","2.jpg");
+                    intent.putExtra("image3","3.jpg");
                     startActivity(intent);
                 }
 
@@ -153,6 +162,14 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
 
             }
         };
+
+    }
+
+    public void reset()
+    {
+        infoDialog.setText(getResources().getString(R.string.image_prev_instructions));
+        imageNumIndicator.setImageResource(android.R.color.transparent);
+        isCapturing = false;
 
     }
 
@@ -311,6 +328,9 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
 
         /*timer = new Timer();
         initTimerTask();*/
+
+        timer = new Timer();
+        initTimerTask();
         timer.schedule(timerTask, 0, timeBetweenSnaps/4);
 
     }
@@ -334,13 +354,13 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                imageNumIndicator.setImageResource(android.R.color.transparent);
-                                infoDialog.setText(getResources().getString(R.string.image_prev_instructions));
+                               reset();
                             }
                         });
 
                         Log.d(TAG, "Stop image capturing");
                         timer.cancel();
+                        isCapturing = false;
 
                     }
 
