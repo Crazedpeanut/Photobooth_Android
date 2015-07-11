@@ -1,12 +1,4 @@
-package net.johnkendall.cameraapp;
-
-import android.util.Log;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.nio.ByteBuffer;
 
 /**
@@ -16,14 +8,14 @@ public class FilesSerializable implements Serializable
 {
     static final long serialVersionUID = 42L;
     final static int INTEGER_SIZE = 4;
-    static final String TAG = "FilesSerializable";
+    final static String TAG = "FilesSerializable";
 
     String[] fileNames;
     byte[][] fileBytes;
 
     File[] files;
 
-
+    int numFiles;
 
     public FilesSerializable(String[] fileNames, byte[][] fileBytes)
     {
@@ -33,6 +25,60 @@ public class FilesSerializable implements Serializable
 
     public FilesSerializable(File[] files) {
         this.files = files;
+    }
+
+    public FilesSerializable(ByteBuffer byteBuffer)
+    {
+        int fileNameSizes[];
+        int fileSizes[];
+
+        numFiles = byteBuffer.getInt();
+
+        System.out.println(String.format("Number of files: %d", numFiles));
+        System.out.println(String.format("Byte buffer pos: %d", byteBuffer.position()));
+
+        fileNameSizes = new int[numFiles];
+        fileSizes = new int[numFiles];
+
+        fileNames = new String[numFiles];
+        fileBytes = new byte[numFiles][];
+
+        for(int i = 0; i < numFiles; i++) //Get the sizes of all the files in byte buffer
+        {
+            fileSizes[i] = byteBuffer.getInt();
+            System.out.println(String.format("File %d size: %d", i, fileSizes[i]));
+        }
+
+        for(int i = 0; i < numFiles; i++) //Get the sizes of all the file names in byte buffer
+        {
+            fileNameSizes[i] = byteBuffer.getInt();
+            System.out.println(String.format("File %d name size: %d", i, fileNameSizes[i]));
+        }
+
+        for(int i = 0; i < numFiles; i++)//Extract the file names from byte buffer
+        {
+            byte[] fileNameBuffer = new byte[fileNameSizes[i]];
+
+            for(int j = 0; j < fileNameBuffer.length; j++)
+            {
+                fileNameBuffer[j] = byteBuffer.get();
+            }
+
+            System.out.println(String.format("Current byte buffer pos: %d", byteBuffer.position()));
+
+            fileNames[i] = String.valueOf(fileNameBuffer);
+        }
+
+        for(int i = 0; i < numFiles; i++)//Extract the file data from byte buffer
+        {
+            byte[] fileBuffer = new byte[fileSizes[i]];
+            byteBuffer.get(fileBuffer);
+
+            fileBytes[i] = fileBuffer;
+        }
+
+        System.out.println(String.format("Current byte buffer pos: %d", byteBuffer.position()));
+
     }
 
     public byte[] toByteArray()
@@ -57,7 +103,7 @@ public class FilesSerializable implements Serializable
         bufferSize += INTEGER_SIZE; //For the total bytes required at the beginning of message
         bufferSize += INTEGER_SIZE; //For the number of files to send
 
-        Log.d(TAG, "Preparing to buffer files");
+        System.out.println("Preparing to buffer files");
 
         try
         {
@@ -76,7 +122,7 @@ public class FilesSerializable implements Serializable
                 fileInputStream = new FileInputStream(files[i]);
                 bufferedInputStream = new BufferedInputStream(fileInputStream);
 
-                Log.d("FileSender", String.format("adding %s to Serilizable", files[i].getPath()));
+                System.out.println(String.format("adding %s to Serilizable", files[i].getPath()));
 
                 if (files[i].exists()) {
                     bufferedInputStream.read(fileDataBuffer, 0, (int) files[i].length());
@@ -115,6 +161,50 @@ public class FilesSerializable implements Serializable
             }
 
             return buffer.array();
+        }
+        catch(IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public File[] saveFiles(String folderName)
+    {
+        files = new File[numFiles];
+
+        for(int i = 0; i < numFiles; i++)
+        {
+            files[i] = saveFile(folderName, fileBytes[i], fileNames[i]);
+        }
+
+        return files;
+    }
+
+    File saveFile(String folderName, byte[] fileData, String fileName)
+    {
+        FileOutputStream fileOutputStream;
+        BufferedOutputStream bufferedOutputStream;
+        String filePath;
+
+        filePath = String.format("%s/$s", folderName, fileName);
+
+        try
+        {
+            if(!new File(filePath).mkdirs())
+            {
+                System.out.println(String.format("Failed to save file: %s", fileName));
+            }
+            else
+            {
+                fileOutputStream = new FileOutputStream(filePath);
+                bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+
+                bufferedOutputStream.write(fileData);
+
+                return new File(filePath);
+            }
         }
         catch(IOException e)
         {
