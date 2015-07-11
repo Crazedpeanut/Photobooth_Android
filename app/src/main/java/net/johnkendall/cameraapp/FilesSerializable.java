@@ -1,3 +1,5 @@
+package net.johnkendall.cameraapp;
+
 import java.io.*;
 import java.nio.ByteBuffer;
 
@@ -9,6 +11,7 @@ public class FilesSerializable implements Serializable
     static final long serialVersionUID = 42L;
     final static int INTEGER_SIZE = 4;
     final static String TAG = "FilesSerializable";
+    final String dir = System.getProperty("user.dir");
 
     String[] fileNames;
     byte[][] fileBytes;
@@ -66,7 +69,14 @@ public class FilesSerializable implements Serializable
 
             System.out.println(String.format("Current byte buffer pos: %d", byteBuffer.position()));
 
-            fileNames[i] = String.valueOf(fileNameBuffer);
+            try {
+                fileNames[i] = new String(fileNameBuffer, "UTF-8");
+            }
+            catch(UnsupportedEncodingException e)
+            {
+                e.printStackTrace();
+            }
+
         }
 
         for(int i = 0; i < numFiles; i++)//Extract the file data from byte buffer
@@ -110,7 +120,7 @@ public class FilesSerializable implements Serializable
             for (int i = 0; i < files.length; i++) {
                 byte[] fileDataBuffer = new byte[(int) files[i].length()];
 
-                fileNames[i] = files[i].getName().getBytes();
+                fileNames[i] = files[i].getName().getBytes("UTF-8");
                 bufferSize += fileNames[i].length;
 
                 fileNameSizes[i] = fileNames[i].length;
@@ -173,11 +183,22 @@ public class FilesSerializable implements Serializable
     public File[] saveFiles(String folderName)
     {
         files = new File[numFiles];
+        String path;
 
-        for(int i = 0; i < numFiles; i++)
+        path = String.format("%s%s",dir, folderName);
+
+        if(new File(path).mkdirs())
         {
-            files[i] = saveFile(folderName, fileBytes[i], fileNames[i]);
+            for(int i = 0; i < numFiles; i++)
+            {
+                files[i] = saveFile(folderName, fileBytes[i], fileNames[i]);
+            }
         }
+        else
+        {
+            System.out.println(String.format("Could not create folder: %s", path));
+        }
+
 
         return files;
     }
@@ -186,25 +207,23 @@ public class FilesSerializable implements Serializable
     {
         FileOutputStream fileOutputStream;
         BufferedOutputStream bufferedOutputStream;
-        String filePath;
+        String path;
 
-        filePath = String.format("%s/$s", folderName, fileName);
+        path = String.format("%s%s",dir, folderName);
 
         try
         {
-            if(!new File(filePath).mkdirs())
-            {
-                System.out.println(String.format("Failed to save file: %s", fileName));
-            }
-            else
-            {
-                fileOutputStream = new FileOutputStream(filePath);
-                bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            File file = new File(String.format("%s\\%s", path, fileName));
 
-                bufferedOutputStream.write(fileData);
+            fileOutputStream = new FileOutputStream(String.format("%s\\%s", path, fileName));
+            bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
 
-                return new File(filePath);
-            }
+            bufferedOutputStream.write(fileData);
+
+            fileOutputStream.close();
+            bufferedOutputStream.close();
+
+            return file;
         }
         catch(IOException e)
         {
