@@ -148,7 +148,7 @@ public class CameraPreviewActivity extends Activity implements SurfaceHolder.Cal
                 {
                     reset();
 
-                    Intent intent = new Intent(getApplicationContext(), ImagePreview.class);
+                    Intent intent = new Intent(getApplicationContext(), ImagePrintPreview.class);
                     intent.putExtra("image0","0.jpg");
                     intent.putExtra("image1","1.jpg");
                     intent.putExtra("image2","2.jpg");

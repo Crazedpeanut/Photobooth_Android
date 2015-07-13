@@ -36,14 +36,20 @@
                 android:value="net.johnkendall.cameraapp.MainActivity" />
         </activity>
         <activity
-            android:name=".ImagePreview"
+            android:name=".ImagePrintPreview"
             android:label="@string/title_activity_image_preview"
             android:parentActivityName=".MainActivity"
-            android:screenOrientation="landscape">
+            android:screenOrientation="landscape" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="net.johnkendall.cameraapp.MainActivity" />
         </activity>
+
+        <service
+            android:name=".SendFileService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
     </application>
 
 </manifest>

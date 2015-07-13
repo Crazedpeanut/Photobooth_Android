@@ -10,4 +10,8 @@
     <string name="title_activity_image_preview">ImagePreview</string>
     <string name="pref_default_image_capture_rate">3700</string>
     <string name="image_prev_instructions">Press the screen to take pictures</string>
+    <string name="files_sent_confirmation">Images have been sent for printing</string>
+    <string name="files_failed_sent_confirmation">Printing of images has failed</string>
+    <string name="image_preview_print">Print</string>
+    <string name="image_preview_redo">Redo</string>
 </resources>

@@ -70,7 +70,11 @@ public class FileSendThread implements Runnable
             outputStream = socket.getOutputStream();
             bufferedOutputStream = new BufferedOutputStream(outputStream);
 
-            bufferedOutputStream.write(buffer);
+            for(int i = 0; i < buffer.length; i++)
+            {
+                bufferedOutputStream.write(buffer[i]);
+                fileSendThreadInterface.handleFileSendCompletionCount(threadName, i, buffer.length);
+            }
 
             outputStream.close();
             bufferedOutputStream.close();

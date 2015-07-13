@@ -6,4 +6,5 @@ package net.johnkendall.cameraapp;
 public interface FileSendThreadInterface {
     void handleFileSendThreadCompletionFailure(String threadName, Exception e);
     void handleFileSendThreadCompletionSuccess(String threadName);
+    void handleFileSendCompletionCount(String threadName, int currentByteCount, int totalByteCount);
 }

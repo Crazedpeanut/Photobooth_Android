@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -22,9 +21,9 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 
 
-public class ImagePreview extends ActionBarActivity {
+public class ImagePrintPreview extends ActionBarActivity {
 
-    final String TAG = "ImagePreview";
+    final String TAG = "ImagePrintPreview";
 
     WebView previewWebView;
     File[] images;
@@ -34,9 +33,7 @@ public class ImagePreview extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.image_preview);
-
-        fileSender = new FileSender(this);
+        setContentView(R.layout.image_print_preview);
 
         intent = getIntent();
         images = new File[4];
@@ -62,8 +59,6 @@ public class ImagePreview extends ActionBarActivity {
                 {
                     Log.d(TAG, String.format("File Name: %s",f.getName()));
                 }
-
-                fileSender.sendFiles(images);
             }
         });
 

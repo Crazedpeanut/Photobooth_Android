@@ -25,15 +25,17 @@ import java.util.prefs.Preferences;
 /**
  * Created by John on 30/05/2015.
  */
-public class FileSender implements FileSendThreadInterface
+public class FileSender
 {
     final static String TAG = "FileSender";
 
     Context context;
+    FileSendThreadInterface fileSendThreadInterface;
 
-    public FileSender(Context context)
+    public FileSender(Context context, FileSendThreadInterface fileSendThreadInterface)
     {
         this.context = context;
+        this.fileSendThreadInterface = fileSendThreadInterface;
     }
 
     static FilesSerializable serializeFiles(File[] files)
@@ -94,17 +96,7 @@ public class FileSender implements FileSendThreadInterface
             Log.d(TAG, String.format("Preparing to send: %s",f.getPath()));
         }
 
-        Thread thread = new Thread(new FileSendThread(files, context, this));
+        Thread thread = new Thread(new FileSendThread(files, context, fileSendThreadInterface));
         thread.start();
-    }
-
-    @Override
-    public void handleFileSendThreadCompletionFailure(String threadName, Exception e) {
-        Log.d(TAG, String.format("%s failed with Exception: %s", threadName, e.getMessage()));
-    }
-
-    @Override
-    public void handleFileSendThreadCompletionSuccess(String threadName) {
-        Log.d(TAG, String.format("%s completed successfully", threadName));
     }
 }
